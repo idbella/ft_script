@@ -6,70 +6,92 @@
 /*   By: sid-bell <sid-bell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/08 20:12:08 by sid-bell          #+#    #+#             */
-/*   Updated: 2019/11/10 01:52:08 by sid-bell         ###   ########.fr       */
+/*   Updated: 2019/11/10 16:21:57 by sid-bell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_script.h"
 
-void	ft_ptyfork(int slave)
+t_params	*ft_getter(t_params *p)
 {
-	pid_t     pid;
+	static t_params *params;
 
-	if (!(pid = fork()))
-	{
-		dup2(0, 10);
-		setsid();
-		if (ioctl(slave, TIOCSCTTY) < 0)
-		{
-			ft_printf_fd(10, "cannot grant pty master's permissions\n");
-			_Exit(1);
-		}
-		dup2(slave, 0);
-		dup2(slave, 1);
-		dup2(slave, 2);
-		char *arg[2] = {"sh", NULL};
-		execve("/bin/bash", arg, NULL);
-		ft_printf_fd(10, "error\n");
-	}
+	if (p)
+		params = p;
+	return (params);
 }
 
-
-
-int main()
+void		ft_copy_stdin_to_master(int master)
 {
-	int             master;
-	int             slave;
-
-	if (!ft_openpty(&master, &slave))
-		_Exit(1);
-	ft_ptyfork(slave);
 	char c;
+
 	if (!fork())
 	{
 		while (read(0, &c, 1) > 0)
-		{
 			write(master, &c, 1);
-		}
-		ft_printf_fd(2, "failed \n");
-		exit(0);
+		_Exit(0);
 	}
-	struct termios term;
-	struct termios cpterm;
-	ft_tcgetattr(0, &term);
-	ft_tcgetattr(0, &cpterm);
-	term.c_lflag &= ~ECHO;
-	term.c_lflag &= ISIG;
-	term.c_lflag &= ~ICANON;
-	ft_tcsetattr(0, &term);
-	int fd = open("typescript", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+}
+
+void		ft_log(t_params *params, int logfile, int master)
+{
+	char c;
+
 	while (read(master, &c, 1) > 0)
 	{
 		ft_printf_fd(1, "%c", c);
-		write(fd, &c, 1);
+		write(logfile, &c, 1);
 	}
-	ft_printf_fd(2, "failed \n");
+	if (!params->flags[(int)'q'])
+	{
+		ft_printf_fd(logfile,
+			"\nScript done, output file is %s\n", params->logfile);
+		ft_printf_fd(1,
+			"\nScript done, output file is %s\n", params->logfile);
+	}
 	close(master);
-	ft_tcsetattr(0, &cpterm);
+}
+
+void		ft_init(t_params *params, char **argv, char **env)
+{
+	char	*args[2];
+
+	ft_bzero(params->flags, 127);
+	params->env = env;
+	params->logfile = NULL;
+	params->command = NULL;
+	ft_getflags(argv + 1);
+	if (!params->logfile)
+		params->logfile = "typescript";
+	if (!params->command)
+		params->command = ft_getloginshell(env);
+	if (!params->argv)
+	{
+		args[0] = params->command;
+		args[1] = NULL;
+	}
+}
+
+int			main(int argc, char **argv, char **env)
+{
+	t_params		params;
+	int				master;
+	int				slave;
+	int				logfile;
+
+	ft_getter(&params);
+	ft_init(&params, argv, env);
+	argc = 0;
+	logfile = ft_openfile(params.logfile);
+	if (!ft_openpty(&master, &slave))
+		_Exit(1);
+	if (ft_exist(params.command))
+	{
+		ft_ptyfork(slave, params.command);
+		ft_setup(&params.term);
+		ft_copy_stdin_to_master(master);
+		ft_log(&params, logfile, master);
+		ft_unsetup(&params.term);
+	}
 	return (0);
 }

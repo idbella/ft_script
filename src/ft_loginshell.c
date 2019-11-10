@@ -1,23 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   grantpt.c                                          :+:      :+:    :+:   */
+/*   ft_loginshell.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: sid-bell <sid-bell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/11/09 23:05:21 by sid-bell          #+#    #+#             */
-/*   Updated: 2019/11/10 13:45:39 by sid-bell         ###   ########.fr       */
+/*   Created: 2019/11/10 13:46:29 by sid-bell          #+#    #+#             */
+/*   Updated: 2019/11/10 13:46:38 by sid-bell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_script.h"
 
-char	ft_grantpt(int master)
+char	*ft_getloginshell(char **env)
 {
-	if (ioctl(master, TIOCPTYGRANT) < 0)
+	int i;
+
+	i = 0;
+	while (env[i])
 	{
-		ft_printf_fd(2, "cannot grant pty master's permissions\n");
-		return (0);
+		if (ft_strnequ(env[i], "SHELL=", 6))
+			return (env[i] + 6);
+		i++;
 	}
-	return (1);
+	return ("/bin/sh");
 }

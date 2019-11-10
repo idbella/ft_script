@@ -1,23 +1,40 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   grantpt.c                                          :+:      :+:    :+:   */
+/*   ft_open.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: sid-bell <sid-bell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/11/09 23:05:21 by sid-bell          #+#    #+#             */
-/*   Updated: 2019/11/10 13:45:39 by sid-bell         ###   ########.fr       */
+/*   Created: 2019/11/10 13:51:19 by sid-bell          #+#    #+#             */
+/*   Updated: 2019/11/10 13:51:30 by sid-bell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_script.h"
 
-char	ft_grantpt(int master)
+char	ft_exist(char *file)
 {
-	if (ioctl(master, TIOCPTYGRANT) < 0)
+	if (access(file, F_OK))
 	{
-		ft_printf_fd(2, "cannot grant pty master's permissions\n");
+		ft_printf_fd(2, "script: %s: No such file or directory\n", file);
+		return (0);
+	}
+	if (access(file, X_OK))
+	{
+		ft_printf_fd(2, "script: %s: Permission denied\n", file);
 		return (0);
 	}
 	return (1);
+}
+
+int		ft_openfile(char *file)
+{
+	int fd;
+
+	if ((fd = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0644)) < 0)
+	{
+		ft_printf_fd(2, "script: %s: Permission denied\n", file);
+		_Exit(1);
+	}
+	return (fd);
 }

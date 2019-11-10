@@ -1,23 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   grantpt.c                                          :+:      :+:    :+:   */
+/*   ft_termios.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: sid-bell <sid-bell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/11/09 23:05:21 by sid-bell          #+#    #+#             */
-/*   Updated: 2019/11/10 13:45:39 by sid-bell         ###   ########.fr       */
+/*   Created: 2019/11/10 13:49:14 by sid-bell          #+#    #+#             */
+/*   Updated: 2019/11/10 13:49:22 by sid-bell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_script.h"
 
-char	ft_grantpt(int master)
+void	ft_setup(struct termios *copy)
 {
-	if (ioctl(master, TIOCPTYGRANT) < 0)
-	{
-		ft_printf_fd(2, "cannot grant pty master's permissions\n");
-		return (0);
-	}
-	return (1);
+	struct termios	term;
+
+	ft_tcgetattr(0, &term);
+	ft_tcgetattr(0, copy);
+	term.c_lflag &= ~ECHO;
+	term.c_lflag &= ISIG;
+	term.c_lflag &= ~ICANON;
+	ft_tcsetattr(0, &term);
+}
+
+void	ft_unsetup(struct termios *copy)
+{
+	ft_tcsetattr(0, copy);
 }
