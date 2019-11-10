@@ -6,7 +6,7 @@
 /*   By: sid-bell <sid-bell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/10 13:51:19 by sid-bell          #+#    #+#             */
-/*   Updated: 2019/11/10 13:51:30 by sid-bell         ###   ########.fr       */
+/*   Updated: 2019/11/10 16:31:53 by sid-bell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,9 +29,15 @@ char	ft_exist(char *file)
 
 int		ft_openfile(char *file)
 {
-	int fd;
+	int			fd;
+	int			mode;
+	t_params	*params;
 
-	if ((fd = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0644)) < 0)
+	params = ft_getter(0);
+	mode = O_WRONLY | O_CREAT | O_TRUNC;
+	if (params->flags[(int)'a'])
+		mode = O_WRONLY | O_CREAT | O_APPEND;
+	if ((fd = open(file, mode, 0644)) < 0)
 	{
 		ft_printf_fd(2, "script: %s: Permission denied\n", file);
 		_Exit(1);

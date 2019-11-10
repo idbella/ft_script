@@ -6,7 +6,7 @@
 /*   By: sid-bell <sid-bell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/09 23:07:26 by sid-bell          #+#    #+#             */
-/*   Updated: 2019/11/10 16:12:46 by sid-bell         ###   ########.fr       */
+/*   Updated: 2019/11/10 17:22:39 by sid-bell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,9 @@
 # include <sys/ioctl.h>
 # include <sys/syscall.h>
 # define OUT "typescript"
-#define FLAGS "adFpqr"
+# define FLAGS "adFpqrk"
 
-typedef struct termios t_term;
+typedef struct termios	t_term;
 
 typedef struct	s_params
 {
