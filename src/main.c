@@ -6,7 +6,7 @@
 /*   By: sid-bell <sid-bell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/08 20:12:08 by sid-bell          #+#    #+#             */
-/*   Updated: 2019/11/10 17:41:55 by sid-bell         ###   ########.fr       */
+/*   Updated: 2019/12/27 16:20:56 by sid-bell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,11 +27,17 @@ void		ft_copy_stdin_to_master(int master, int logfile)
 
 	if (!fork())
 	{
-		while (read(0, &c, 1) > 0)
+		if (ft_getter(0)->flags[(int)'r'])
+			ft_recorder(master, logfile);
+		else
 		{
-			if (ft_getter(0)->flags[(int)'r'] || ft_getter(0)->flags[(int)'k'])
-				write(logfile, &c, 1);
-			write(master, &c, 1);
+			while (read(0, &c, 1) > 0)
+			{
+				ft_printf_fd(2, "k = %d\n", ft_getter(0)->flags[(int)'k']);
+				if (ft_getter(0)->flags[(int)'k'])
+					write(logfile, &c, 1);
+				write(master, &c, 1);
+			}
 		}
 		_Exit(0);
 	}
@@ -43,7 +49,7 @@ void		ft_log(t_params *params, int logfile, int master)
 
 	while (read(master, &c, 1) > 0)
 	{
-		ft_printf_fd(1, "%c", c);
+		write(1, &c, 1);
 		write(logfile, &c, 1);
 	}
 	if (!params->flags[(int)'q'])

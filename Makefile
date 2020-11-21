@@ -6,7 +6,7 @@
 #    By: sid-bell <sid-bell@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/11/09 22:46:45 by sid-bell          #+#    #+#              #
-#    Updated: 2019/11/10 15:02:17 by sid-bell         ###   ########.fr        #
+#    Updated: 2019/11/10 20:55:07 by sid-bell         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,7 +23,8 @@ src/ft_ptyfork.o\
 src/ft_loginshell.o\
 src/ft_open.o\
 src/ft_termios.o\
-src/ft_getflags.o
+src/ft_getflags.o\
+src/ft_record.o
 
 CFLAGS= -g -Isrc/ -Wall -Wextra -Werror
 all: libft $(NAME)
